@@ -163,3 +163,5 @@ tlc.padString = function(str, len, char)
 	return string.rep(char, len - #str) .. str
 end
 tlc.pad 	=	tlc.padString -- ALIAS
+
+return tlc
