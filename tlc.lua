@@ -26,6 +26,13 @@ tlc.isModuleLoaded 	= 	tlc.isModuleAvailable -- ALIAS
 tlc.isLoaded 		= 	tlc.isModuleAvailable -- ALIAS
 tlc.hasModule		= 	tlc.isModuleAvailable -- ALIAS
 
+-- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
+tlc.tableHasKey = function (table, key)
+	return table[key] ~= nil
+end
+tlc.thK 	=	tlc.tableHasKey -- ALIAS
+tlc.hk 		=	tlc.tableHasKey -- ALIAS
+
 --------------------------
 --Math and logic functions
 --------------------------
@@ -44,6 +51,8 @@ tlc.clamp = function(a, limitA, limitB)
 	end
 	return a
 end
+tlc.cmp 	=	tlc.isBetween -- ALIAS
+tlc.cl 		=	tlc.isBetween -- ALIAS
 
 -- isBetween - check if value a is strictly between two further values
 tlc.isBetween = function(a, min, max)
