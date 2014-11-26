@@ -26,6 +26,13 @@ tlc.isModuleLoaded 	= 	tlc.isModuleAvailable -- ALIAS
 tlc.isLoaded 		= 	tlc.isModuleAvailable -- ALIAS
 tlc.hasModule		= 	tlc.isModuleAvailable -- ALIAS
 
+-- isDefined - checks if object exists
+tlc.isDefined = function (object)
+	return object ~= nil
+end
+tlc.existis = tlc.isDefined -- ALIAS
+tlc.isDef =   tlc.isDefined -- ALIAS
+
 -- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
 tlc.tableHasKey = function (table, key)
 	return table[key] ~= nil
