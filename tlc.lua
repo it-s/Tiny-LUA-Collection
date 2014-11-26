@@ -40,6 +40,39 @@ end
 tlc.thK 	=	tlc.tableHasKey -- ALIAS
 tlc.hk 		=	tlc.tableHasKey -- ALIAS
 
+tlc.Iterator = function(arr)
+	local obj = arr
+	local cursor = 1
+	local iterator = {}
+	iterator.total = function()
+		return #obj
+	end
+	iterator.hasNext = function()
+		return tlc.switch (
+				tlc.isMoreThen(tlc.increase(cursor), #obj),
+				false,
+				true
+			)
+	end
+	iterator.next = function()
+		cursor = tlc.increase(cursor)
+		return obj[cursor]
+	end
+	iterator.getCursor = function()
+		return cursor
+	end
+	iterator.setCursor = function(i)
+		cursor = tlc.clamp( i, 0, #obj)
+	end
+	iterator.toBeginning = function()
+		cursor = 1
+	end
+	iterator.toEnd = function()
+		cursor = #obj
+	end
+	return iterator
+end
+
 --------------------------
 --Math and logic functions
 --------------------------
