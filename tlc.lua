@@ -35,7 +35,7 @@ tlc.isDef =   tlc.isDefined -- ALIAS
 
 -- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
 tlc.tableHasKey = function (table, key)
-	return table[key] ~= nil
+	return tlc.isDefined(table[key])
 end
 tlc.thK 	=	tlc.tableHasKey -- ALIAS
 tlc.hk 		=	tlc.tableHasKey -- ALIAS
