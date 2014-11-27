@@ -1,30 +1,8 @@
 local tlc = {}
 
 --------------------------
---Useful functions
+--Table related functions
 --------------------------
-
--- Check if module [name] is already loaded
--- http://stackoverflow.com/questions/15429236/how-to-check-if-a-module-exists-in-lua
-tlc.isModuleAvailable = function (name)
-  if package.loaded[name] then
-    return true
-  else
-    for _, searcher in ipairs(package.searchers or package.loaders) do
-      local loader = searcher(name)
-      if type(loader) == 'function' then
-        package.preload[name] = loader
-        return true
-      end
-    end
-    return false
-  end
-end
-
--- isDefined - checks if object exists
-tlc.isDefined = function (object)
-	return not tlc.isNil(object)
-end
 
 -- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
 tlc.tableHasKey = function (tbl, key)
@@ -101,7 +79,7 @@ end
 -- tableExtend - copy keys from source table to the destination table
 tlc.tableExtend = function( dest, src )
 	if not tlc.isTable( dest ) then return error("Destination is not a table.") end
-	if not tlc.isTable( src ) then return error("Source is not a table.") end
+	if not tlc.isTable( src ) then return dest end
 	local iterator = tlc.Iterator (src)
 	while( iterator.hasNext() ) do
 		dest[iterator.key()] = iterator.value()
@@ -124,6 +102,10 @@ tlc.tableHasRequiredKeys = function( tbl, rec )
 	return true
 end
 
+--------------------------
+--Object type tests
+--------------------------
+
 -- isTable, isNumber, isString, isFunction, isBoolean, isNil - object type testers
 tlc.isTable  = function( obj )
 	return type(obj) == "table"
@@ -143,17 +125,34 @@ end
 tlc.isNil = function( obj )
 	return type(obj) == "nil"
 end
-
--- UID - Generate a semi-random ID from os.time()
-tlc.UID = function ()
-	math.randomseed(os.time())
-	local id = math.random( ) * 1000000
-	return (string.format("%07d", id))
+-- isDefined - checks if object exists
+tlc.isDefined = function (object)
+	return not tlc.isNil(object)
 end
 
 --------------------------
---Math and logic functions
+--Math functions
 --------------------------
+
+-- increase - increase a by the amount specified
+tlc.increase = function(a, by)
+	return (a + by)
+end
+
+-- increase - increase a by 1
+tlc.increment = function(a)
+	return tlc.increase(a,1)
+end
+
+-- decreaseBy - decrease a by the amount specified
+tlc.decrease = function(a,by)
+	return tlc.increase(a, by*-1)
+end
+
+-- increase - decrease a by 1
+tlc.decrement = function(a)
+	return tlc.increase(a,-1)
+end
 
 -- clamp — constrain a value to lie between two further values
 tlc.clamp = function(a, limitA, limitB)
@@ -169,6 +168,10 @@ tlc.clamp = function(a, limitA, limitB)
 	end
 	return a
 end
+
+--------------------------
+--Logic functions
+--------------------------
 
 -- isBetween - check if value a is strictly between two further values
 tlc.isBetween = function(a, min, max)
@@ -193,26 +196,6 @@ end
 -- isZero - check is a is 0 value
 tlc.isZero = function(a)
 	return tlc.isEqualTo(a,0)
-end
-
--- increase - increase a by the amount specified
-tlc.increase = function(a, by)
-	return (a + by)
-end
-
--- increase - increase a by 1
-tlc.increment = function(a)
-	return tlc.increase(a,1)
-end
-
--- decreaseBy - decrease a by the amount specified
-tlc.decrease = function(a,by)
-	return tlc.increase(a, by*-1)
-end
-
--- increase - decrease a by 1
-tlc.decrement = function(a)
-	return tlc.increase(a,-1)
 end
 
 -- isPositive - check if a is strictly more then 0
@@ -258,6 +241,34 @@ end
 tlc.padString = function(str, len, char)
 	if char == nil then char = ' ' end
 	return string.rep(char, len - #str) .. str
+end
+
+--------------------------
+--Misc seful functions
+--------------------------
+
+-- Check if module [name] is already loaded
+-- http://stackoverflow.com/questions/15429236/how-to-check-if-a-module-exists-in-lua
+tlc.isModuleAvailable = function (name)
+  if package.loaded[name] then
+    return true
+  else
+    for _, searcher in ipairs(package.searchers or package.loaders) do
+      local loader = searcher(name)
+      if type(loader) == 'function' then
+        package.preload[name] = loader
+        return true
+      end
+    end
+    return false
+  end
+end
+
+-- UID - Generate a semi-random ID from os.time()
+tlc.UID = function ()
+	math.randomseed(os.time())
+	local id = math.random( ) * 1000000
+	return (string.format("%07d", id))
 end
 
 return tlc
