@@ -92,6 +92,12 @@ tlc.isNil = function( obj )
 	return type(obj) == "nil"
 end
 
+tlc.UID = function ()
+	math.randomseed(os.time())
+	local id = math.random( ) * 1000000
+	return (string.format("%07d", id))
+end
+
 --------------------------
 --Math and logic functions
 --------------------------
