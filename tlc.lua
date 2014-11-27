@@ -19,29 +19,36 @@ tlc.isModuleAvailable = function (name)
     end
     return false
   end
-end 
-
-tlc.isModulePresent = 	tlc.isModuleAvailable -- ALIAS
-tlc.isModuleLoaded 	= 	tlc.isModuleAvailable -- ALIAS
-tlc.isLoaded 		= 	tlc.isModuleAvailable -- ALIAS
-tlc.hasModule		= 	tlc.isModuleAvailable -- ALIAS
+end
 
 -- isDefined - checks if object exists
 tlc.isDefined = function (object)
-	return object ~= nil
+	return not tlc.isNil(object)
 end
-tlc.existis = tlc.isDefined -- ALIAS
-tlc.isDef =   tlc.isDefined -- ALIAS
 
 -- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
-tlc.tableHasKey = function (table, key)
-	return tlc.isDefined(table[key])
+tlc.tableHasKey = function (tbl, key)
+	return tlc.isDefined(tbl[key])
 end
-tlc.thK 	=	tlc.tableHasKey -- ALIAS
-tlc.hk 		=	tlc.tableHasKey -- ALIAS
 
-tlc.Iterator = function(arr)
-	local obj = arr
+-- tableKeys - get a table of keys from the source table
+tlc.tableKeys = function (tbl)
+	if not tlc.isTable( tbl ) then return error("Could not extract keys. Object is not a table.") end
+	local keys = {}
+	local n = 0
+	
+	for key, value in pairs(tbl) do
+	  n = n + 1
+	  keys[n] = key
+	end
+	return keys
+end
+
+-- Iterator - create an iterator object from source table
+tlc.Iterator = function(tbl)
+	if not tlc.isTable( tbl ) then return error("Could not create an Iterator. Object is not a table.") end
+	local obj = tbl
+	local keys = tlc.tableKeys(tbl)
 	local cursor = 1
 	local iterator = {}
 	iterator.total = function()
@@ -49,14 +56,20 @@ tlc.Iterator = function(arr)
 	end
 	iterator.hasNext = function()
 		return tlc.switch (
-				tlc.isMoreThen(tlc.increase(cursor), #obj),
+				tlc.isMoreThen(tlc.increment(cursor), #obj),
 				false,
 				true
 			)
 	end
+	iterator.key = function()
+		return keys[cursor]
+	end
+	iterator.value = function()
+		return obj[keys[cursor]]
+	end
 	iterator.next = function()
 		cursor = tlc.increase(cursor)
-		return obj[cursor]
+		return obj[keys[cursor]]
 	end
 	iterator.getCursor = function()
 		return cursor
@@ -73,7 +86,46 @@ tlc.Iterator = function(arr)
 	return iterator
 end
 
-tlc.isTable = function( obj )
+-- tableCopy - create a shallow copy of the source table
+tlc.tableCopy = function( tbl )
+	if not tlc.isTable( tbl ) then return error("Could not create a copy. Object is not a table.") end
+	local iterator = tlc.Iterator (tbl)
+	local res = {}
+	while( iterator.hasNext() ) do
+		res[iterator.key()] = iterator.value()
+		iterator.next()
+	end
+	return res
+end
+
+-- tableExtend - copy keys from source table to the destination table
+tlc.tableExtend = function( dest, src )
+	if not tlc.isTable( dest ) then return error("Destination is not a table.") end
+	if not tlc.isTable( src ) then return error("Source is not a table.") end
+	local iterator = tlc.Iterator (src)
+	while( iterator.hasNext() ) do
+		dest[iterator.key()] = iterator.value()
+		iterator.next()
+	end
+	return dest
+end
+
+-- tableHasRequiredKeys -- check if the required keys are present in the table and their values is not a nil
+tlc.tableHasRequiredKeys = function( tbl, rec )
+	if not tlc.isTable( dest ) then return error("Destination is not a table.") end
+	if not tlc.isTable( rec ) then return error("Requirement is not a table.") end
+	local iterator = tlc.Iterator (rec)
+	while( iterator.hasNext() ) do
+		local test = iterator.next()
+		if not tlc.tableHasKey( tbl, test ) or not tlc.isDefined( tbl[test] ) then
+			return false
+		end
+	end
+	return true
+end
+
+-- isTable, isNumber, isString, isFunction, isBoolean, isNil - object type testers
+tlc.isTable,  = function( obj )
 	return type(obj) == "table"
 end
 tlc.isNumber = function( obj )
@@ -92,6 +144,7 @@ tlc.isNil = function( obj )
 	return type(obj) == "nil"
 end
 
+-- UID - Generate a semi-random ID from os.time()
 tlc.UID = function ()
 	math.randomseed(os.time())
 	local id = math.random( ) * 1000000
@@ -116,85 +169,61 @@ tlc.clamp = function(a, limitA, limitB)
 	end
 	return a
 end
-tlc.cmp 	=	tlc.isBetween -- ALIAS
-tlc.cl 		=	tlc.isBetween -- ALIAS
 
 -- isBetween - check if value a is strictly between two further values
 tlc.isBetween = function(a, min, max)
 	return tlc.isMoreThen(a,min) and tlc.isLessThen(a,max)
 end
-tlc.isBN 	=	tlc.isBetween -- ALIAS
-tlc.bwn 	=	tlc.isBetween -- ALIAS
 
 -- isMoreThen - check is a is strictly more then limit
 tlc.isMoreThen = function(a, limit)
 	return (a > limit)
 end
-tlc.isMT 	=	tlc.isMoreThen -- ALIAS
-tlc.mt 		=	tlc.isMoreThen -- ALIAS
 
 -- isLessThen - check is a is strictly less then limit
 tlc.isLessThen = function(a,limit)
 	return (a < limit)
 end
-tlc.isLT 	=	tlc.isLessThen -- ALIAS
-tlc.lt 		=	tlc.isLessThen -- ALIAS
 
 -- isEqualTo - check is a is exactly equal to b
 tlc.isEqualTo = function(a,b)
 	return (a==b)
 end
-tlc.isEQ 	=	tlc.isEqualTo -- ALIAS
-tlc.eq 		=	tlc.isEqualTo -- ALIAS
 
 -- isZero - check is a is 0 value
 tlc.isZero = function(a)
 	return tlc.isEqualTo(a,0)
 end
-tlc.isZ 	=	tlc.isZero -- ALIAS
-tlc.zro		=	tlc.isZero -- ALIAS
 
--- increaseBy - increase a by the amount specified
-tlc.increaseBy = function(a, by)
-	return (a+by)
+-- increase - increase a by the amount specified
+tlc.increase = function(a, by)
+	return (a + by)
 end
-tlc.incB 	=	tlc.increaseBy -- ALIAS
-tlc.ib		=	tlc.increaseBy -- ALIAS
 
 -- increase - increase a by 1
-tlc.increase = function(a)
-	return tlc.increaseBy(a,1)
+tlc.increment = function(a)
+	return tlc.increase(a,1)
 end
-tlc.inc 	=	tlc.increase -- ALIAS
-tlc.i		=	tlc.increase -- ALIAS
 
 -- decreaseBy - decrease a by the amount specified
-tlc.decreaseBy = function(a,by)
-	return tlc.increaseBy(a,by*-1)
+tlc.decrease = function(a,by)
+	return tlc.increase(a, by*-1)
 end
-tlc.decB 	=	tlc.decreaseBy -- ALIAS
-tlc.db		=	tlc.decreaseBy -- ALIAS
 
 -- increase - decrease a by 1
-tlc.decrease = function(a)
-	return tlc.increaseBy(a,-1)
+tlc.decrement = function(a)
+	return tlc.increase(a,-1)
 end
-tlc.dec 	=	tlc.decrease -- ALIAS
-tlc.d		=	tlc.decrease -- ALIAS
 
 -- isPositive - check if a is strictly more then 0
 tlc.isPositive = function(a)
 	return (a>0)
 end
-tlc.isP 	=	tlc.isPositive -- ALIAS
-tlc.p		=	tlc.isPositive -- ALIAS
 
 -- isNegative - check if a is strictly less then 0
 tlc.isNegative = function(a)
 	return not tlc.isPositive(a)
 end
-tlc.isN 	=	tlc.isNegative -- ALIAS
-tlc.n		=	tlc.isNegative -- ALIAS
 
 -- isFactorOf - check if a is strictly less then 0
 tlc.isFactorOf = function(a,b)
@@ -205,15 +234,11 @@ end
 tlc.isOdd = function(a)
 	return ((a - math.floor(a/2)*2) ~= 0)
 end
-tlc.isO 	=	tlc.isOdd -- ALIAS
-tlc.o		=	tlc.isOdd -- ALIAS
 
 -- isEven - check if a is an even number
 tlc.isEven = function(a)
 	return not tlc.isOdd(a)
 end
-tlc.isE 	=	tlc.isEven -- ALIAS
-tlc.e		=	tlc.isEven -- ALIAS
 
 -- switch - if condition is satistied then return yes otherwise return no
 tlc.switch = function(condition, yes, no)
@@ -223,8 +248,6 @@ tlc.switch = function(condition, yes, no)
 		return no
 	end
 end
-tlc.swt 	=	tlc.isEven -- ALIAS
-tlc.s		=	tlc.isEven -- ALIAS
 
 --------------------------
 --String and Formatting functions
@@ -236,6 +259,5 @@ tlc.padString = function(str, len, char)
 	if char == nil then char = ' ' end
 	return string.rep(char, len - #str) .. str
 end
-tlc.pad 	=	tlc.padString -- ALIAS
 
 return tlc
