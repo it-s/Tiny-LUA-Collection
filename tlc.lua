@@ -73,6 +73,25 @@ tlc.Iterator = function(arr)
 	return iterator
 end
 
+tlc.isTable = function( obj )
+	return type(obj) == "table"
+end
+tlc.isNumber = function( obj )
+	return type(obj) == "number"
+end
+tlc.isString = function( obj )
+	return type(obj) == "string"
+end
+tlc.isFunction = function( obj )
+	return type(obj) == "function"
+end
+tlc.isBoolean = function( obj )
+	return type(obj) == "boolean"
+end
+tlc.isNil = function( obj )
+	return type(obj) == "nil"
+end
+
 --------------------------
 --Math and logic functions
 --------------------------
