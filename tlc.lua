@@ -125,7 +125,7 @@ tlc.tableHasRequiredKeys = function( tbl, rec )
 end
 
 -- isTable, isNumber, isString, isFunction, isBoolean, isNil - object type testers
-tlc.isTable,  = function( obj )
+tlc.isTable  = function( obj )
 	return type(obj) == "table"
 end
 tlc.isNumber = function( obj )
