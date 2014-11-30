@@ -27,39 +27,46 @@ tlc.Iterator = function(tbl)
 	if not tlc.isTable( tbl ) then return error("Could not create an Iterator. Object is not a table.") end
 	local obj = tbl
 	local keys = tlc.tableKeys(tbl)
-	local cursor = 1
+	local length = #keys
+	local cursor = 0
 	local iterator = {}
+	
+	local function _cursor()
+	  return tlc.clamp( cursor, 1, length)
+	end
+	local function _hasNext()
+		return tlc.isLessThen(tlc.increment(cursor), tlc.increment(length))
+	end
+	local function _key()
+		return keys[_cursor()]
+	end
+	local function _val()
+		return obj[keys[_cursor()]]
+	end
+	
 	iterator.total = function()
-		return #obj
+		return length
 	end
-	iterator.hasNext = function()
-		return tlc.switch (
-				tlc.isMoreThen(tlc.increment(cursor), #obj),
-				false,
-				true
-			)
-	end
-	iterator.key = function()
-		return keys[cursor]
-	end
-	iterator.value = function()
-		return obj[keys[cursor]]
-	end
+	iterator.hasNext = _hasNext
+	iterator.key = _key
+	iterator.value = _val
 	iterator.next = function()
-		cursor = tlc.increase(cursor)
-		return obj[keys[cursor]]
+		if not _hasNext() then return nil end
+		cursor = tlc.clamp( tlc.increment(cursor) , 1, length)
+		local key, val = _key(), _val()
+		return key, val
 	end
 	iterator.getCursor = function()
-		return cursor
+		return _cursor()
 	end
 	iterator.setCursor = function(i)
-		cursor = tlc.clamp( i, 0, #obj)
+		cursor = tlc.clamp( i, 1, length)
 	end
 	iterator.toBeginning = function()
-		cursor = 1
+		cursor = 0
 	end
 	iterator.toEnd = function()
-		cursor = #obj
+		cursor = length
 	end
 	return iterator
 end
@@ -69,9 +76,8 @@ tlc.tableCopy = function( tbl )
 	if not tlc.isTable( tbl ) then return error("Could not create a copy. Object is not a table.") end
 	local iterator = tlc.Iterator (tbl)
 	local res = {}
-	while( iterator.hasNext() ) do
-		res[iterator.key()] = iterator.value()
-		iterator.next()
+	for k,v in iterator.next do
+	  res[k] = v
 	end
 	return res
 end
@@ -81,21 +87,19 @@ tlc.tableExtend = function( dest, src )
 	if not tlc.isTable( dest ) then return error("Destination is not a table.") end
 	if not tlc.isTable( src ) then return dest end
 	local iterator = tlc.Iterator (src)
-	while( iterator.hasNext() ) do
-		dest[iterator.key()] = iterator.value()
-		iterator.next()
+	for k,v in iterator.next do
+	  dest[k] = v
 	end
 	return dest
 end
 
 -- tableHasRequiredKeys -- check if the required keys are present in the table and their values is not a nil
-tlc.tableHasRequiredKeys = function( tbl, rec )
-	if not tlc.isTable( dest ) then return error("Destination is not a table.") end
+tlc.tableHasKeys = function( tbl, rec )
+	if not tlc.isTable( tbl ) then return error("Destination is not a table.") end
 	if not tlc.isTable( rec ) then return error("Requirement is not a table.") end
 	local iterator = tlc.Iterator (rec)
-	while( iterator.hasNext() ) do
-		local test = iterator.next()
-		if not tlc.tableHasKey( tbl, test ) or not tlc.isDefined( tbl[test] ) then
+	while iterator.next() do
+		if not tlc.tableHasKey( tbl, iterator.value() ) or tlc.isNil( tbl[iterator.value()] ) then
 			return false
 		end
 	end
@@ -113,8 +117,14 @@ end
 tlc.isNumber = function( obj )
 	return type(obj) == "number"
 end
+tlc.isZero = function( obj )
+	return tlc.isNumber(obj) and obj == 0
+end
 tlc.isString = function( obj )
 	return type(obj) == "string"
+end
+tlc.isEmptyString = function( obj )
+	return tlc.isString(obj) and obj == ""
 end
 tlc.isFunction = function( obj )
 	return type(obj) == "function"
@@ -244,7 +254,7 @@ tlc.padString = function(str, len, char)
 end
 
 --------------------------
---Misc seful functions
+--Misc functions
 --------------------------
 
 -- Check if module [name] is already loaded

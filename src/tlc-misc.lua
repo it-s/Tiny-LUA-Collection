@@ -1,3 +1,4 @@
+local tlc = tlc or {}
 --------------------------
 --Misc seful functions
 --------------------------
@@ -25,3 +26,4 @@ tlc.UID = function ()
 	local id = math.random( ) * 1000000
 	return (string.format("%07d", id))
 end
+return tlc
