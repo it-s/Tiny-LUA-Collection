@@ -1,4 +1,4 @@
-local tlc = tlc or {}
+tlc = tlc or {}
 --------------------------
 --String and Formatting functions
 --------------------------
@@ -9,5 +9,3 @@ tlc.padString = function(str, len, char)
 	if char == nil then char = ' ' end
 	return string.rep(char, len - #str) .. str
 end
-
-return tlc
