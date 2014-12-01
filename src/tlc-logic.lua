@@ -1,4 +1,4 @@
-local tlc = tlc or {}
+tlc = tlc or {}
 --------------------------
 --Logic functions
 --------------------------
@@ -61,5 +61,3 @@ tlc.switch = function(condition, yes, no)
                 return no
         end
 end
-
-return tlc
