@@ -1,4 +1,4 @@
-local tlc = tlc or {}
+tlc = tlc or {}
 --------------------------
 --Math functions
 --------------------------
@@ -37,5 +37,3 @@ tlc.clamp = function(a, limitA, limitB)
         end
         return a
 end
-
-return tlc
