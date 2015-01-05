@@ -1,3 +1,5 @@
+local pairs = pairs
+local ipairs = ipairs
 local _c=function(b,c)for d,e in pairs(c)do b[d]=e end;return b end
 local tlc = {}
 
