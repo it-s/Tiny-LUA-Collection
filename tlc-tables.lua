@@ -1,16 +1,20 @@
-local tlc = tlc or {}
 --------------------------
 --Table related functions
 --------------------------
+local pairs = pairs
+local error = error
+local function _t ( obj ) return type(obj) == "table" end
+local function _c (a, min, max) if max and a > max then a = max end; if min and a < min then a = min end; return a end
+local function _l (a,lim) return (a < lim) end
 
 -- tableHasKey - checks if table has a specific key and retrurn TRUE if it does
-tlc.tableHasKey = function (tbl, key)
-        return tlc.isDefined(tbl[key])
+local function tableHasKey (tbl, key)
+        return tbl[key] ~= "nil"
 end
 
 -- tableKeys - get a table of keys from the source table
-tlc.tableKeys = function (tbl)
-        if not tlc.isTable( tbl ) then return error("Could not extract keys. Object is not a table.") end
+local function tableKeys (tbl)
+        if not local function _t( tbl ) then return error("Could not extract keys. Object is not a table.") end
         local keys = {}
         local n = 0
         
@@ -22,19 +26,22 @@ tlc.tableKeys = function (tbl)
 end
 
 -- Iterator - create an iterator object from source table
-tlc.Iterator = function(tbl)
-        if not tlc.isTable( tbl ) then return error("Could not create an Iterator. Object is not a table.") end
+local function Iterator = function(tbl)
+        if not local function _t( tbl ) then return error("Could not create an Iterator. Object is not a table.") end
         local obj = tbl
-        local keys = tlc.tableKeys(tbl)
+        local keys = tableKeys(tbl)
         local length = #keys
         local cursor = 0
         local iterator = {}
         
         local function _cursor()
-          return tlc.clamp( cursor, 1, length)
+          return _c( cursor, 1, length)
         end
         local function _hasNext()
-                return tlc.isLessThen(tlc.increment(cursor), tlc.increment(length))
+                return _i(cursor) < _i(length)
+        end
+        local function _hasPrevious()
+                return _d(cursor) > _d(length)
         end
         local function _key()
                 return keys[_cursor()]
@@ -42,38 +49,56 @@ tlc.Iterator = function(tbl)
         local function _val()
                 return obj[keys[_cursor()]]
         end
-        
-        iterator.total = function()
+		local function _len()
                 return length
         end
-        iterator.hasNext = _hasNext
-        iterator.key = _key
-        iterator.value = _val
-        iterator.next = function()
+		local function _next()
                 if not _hasNext() then return nil end
-                cursor = tlc.clamp( tlc.increment(cursor) , 1, length)
+                cursor = _c( _i(cursor) , 1, length)
                 local key, val = _key(), _val()
                 return key, val
         end
-        iterator.getCursor = function()
+		local function _previous()
+                if not _hasPrevious() then return nil end
+                cursor = _c( _d(cursor) , 1, length)
+                local key, val = _key(), _val()
+                return key, val
+        end
+		local function _total()
+                return length
+        end
+		local function _getCursor()
                 return _cursor()
         end
-        iterator.setCursor = function(i)
-                cursor = tlc.clamp( i, 1, length)
+		local function _setCursor()
+                cursor = _c( i, 1, length)
         end
-        iterator.toBeginning = function()
+		local function _toBeginning()
                 cursor = 0
         end
-        iterator.toEnd = function()
+		local function _toEnd()
                 cursor = length
         end
-        return iterator
+        
+        return {
+			total = _total,
+			hasNext = _hasNext,
+			hasPrevious = _hasPrevious,
+			key = _key,
+			value = _val,
+			next = _next,
+			previous = _previous,
+			getCursor = _getCursor,
+			setCursor = _setCursor,
+			toBeginning = _toBeginning,
+			toEnd = _toEnd
+		}
 end
 
 -- tableCopy - create a shallow copy of the source table
-tlc.tableCopy = function( tbl )
-        if not tlc.isTable( tbl ) then return error("Could not create a copy. Object is not a table.") end
-        local iterator = tlc.Iterator (tbl)
+local function tableCopy = function( tbl )
+        if not _t( tbl ) then return error("Could not create a copy. Object is not a table.") end
+        local iterator = Iterator (tbl)
         local res = {}
         for k,v in iterator.next do
           res[k] = v
@@ -82,10 +107,10 @@ tlc.tableCopy = function( tbl )
 end
 
 -- tableExtend - copy keys from source table to the destination table
-tlc.tableExtend = function( dest, src )
-        if not tlc.isTable( dest ) then return error("Destination is not a table.") end
-        if not tlc.isTable( src ) then return dest end
-        local iterator = tlc.Iterator (src)
+local function tableExtend = function( dest, src )
+        if not _t( dest ) then return error("Destination is not a table.") end
+        if not _t( src ) then return dest end
+        local iterator = Iterator (src)
         for k,v in iterator.next do
           dest[k] = v
         end
@@ -93,16 +118,28 @@ tlc.tableExtend = function( dest, src )
 end
 
 -- tableHasRequiredKeys -- check if the required keys are present in the table and their values is not a nil
-tlc.tableHasKeys = function( tbl, rec )
-        if not tlc.isTable( tbl ) then return error("Destination is not a table.") end
-        if not tlc.isTable( rec ) then return error("Requirement is not a table.") end
-        local iterator = tlc.Iterator (rec)
+local function tableHasKeys = function( tbl, rec )
+        if not _t( tbl ) then return error("Destination is not a table.") end
+        if not _t( rec ) then return error("Requirement is not a table.") end
+        local iterator = Iterator (rec)
         while iterator.next() do
-                if not tlc.tableHasKey( tbl, iterator.value() ) or tlc.isNil( tbl[iterator.value()] ) then
+                if not tableHasKey( tbl, iterator.value() ) or tbl[iterator.value()] == nil then
                         return false
                 end
         end
         return true
 end
 
-return tlc
+local class = {
+	tableHasKey = tableHasKey,
+	tableKeys = tableKeys,
+	Iterator = Iterator,
+	tableCopy = tableCopy,
+	tableExtend = tableExtend,
+	tableHasKeys = tableHasKeys
+}
+
+-- finally we return the result
+if _t(TLC) then
+	_e(TLC, class)
+else return class end

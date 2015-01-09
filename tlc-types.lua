@@ -1,36 +1,51 @@
-local tlc = tlc or {}
 --------------------------
 --Object type tests
 --------------------------
+local type = type
 
 -- isTable, isNumber, isString, isFunction, isBoolean, isNil - object type testers
-tlc.isTable  = function( obj )
+local function isTable ( obj )
         return type(obj) == "table"
 end
-tlc.isNumber = function( obj )
+local function isNumber ( obj )
         return type(obj) == "number"
 end
-tlc.isZero = function( obj )
-        return tlc.isNumber(obj) and obj == 0
+local function isZero ( obj )
+        return isNumber(obj) and obj == 0
 end
-tlc.isString = function( obj )
+local function isString ( obj )
         return type(obj) == "string"
 end
-tlc.isEmptyString = function( obj )
-        return tlc.isString(obj) and obj == ""
+local function isEmptyString ( obj )
+        return isString(obj) and obj == ""
 end
-tlc.isFunction = function( obj )
+local function isFunction ( obj )
         return type(obj) == "function"
 end
-tlc.isBoolean = function( obj )
+local function isBoolean ( obj )
         return type(obj) == "boolean"
 end
-tlc.isNil = function( obj )
+local function isNil ( obj )
         return type(obj) == "nil"
 end
 -- isDefined - checks if object exists
-tlc.isDefined = function (object)
-        return not tlc.isNil(object)
+local function isDefined  (object)
+        return not isNil(object)
 end
 
-return tlc
+local class = {
+	isTable = isTable,
+	isNumber = isNumber,
+	isZero = isZero,
+	isString = isString,
+	isEmptyString = isEmptyString,
+	isFunction = isFunction,
+	isBoolean = isBoolean,
+	isNil = isNil,
+	isDefined = isDefined
+}
+
+-- finally we return the result
+if _t(TLC) then
+	_e(TLC, class)
+else return class end

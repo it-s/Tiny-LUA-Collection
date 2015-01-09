@@ -1,41 +1,49 @@
-local tlc = tlc or {}
 --------------------------
 --Math functions
 --------------------------
 
 -- increase - increase a by the amount specified
-tlc.increase = function(a, by)
+local function increase (a, by)
         return (a + by)
 end
 
 -- increase - increase a by 1
-tlc.increment = function(a)
-        return tlc.increase(a,1)
+local function increment (a)
+        return increase(a,1)
 end
 
 -- decreaseBy - decrease a by the amount specified
-tlc.decrease = function(a,by)
-        return tlc.increase(a, by*-1)
+local function decrease (a,by)
+        return increase(a, by*-1)
 end
 
 -- increase - decrease a by 1
-tlc.decrement = function(a)
-        return tlc.increase(a,-1)
+local function decrement (a)
+        return increase(a,-1)
 end
 
 -- clamp — constrain a value to lie between two further values
-tlc.clamp = function(a, limitA, limitB)
-        if limitB
-                and a > limitB then
-                        a = limitB
+local function clamp (a, min, max)
+        if max
+                and a > max then
+                        a = max
         end
-        if limitA and
-                (limitB and a < limitA)
-                or
-                (not limitB and a > limitA) then
-                        a=limitA
+        if min
+                and a < min  then
+                        a = min
         end
         return a
 end
 
-return tlc
+local class = {
+	increase = increase,
+	increment = increment,
+	decrease = decrease,
+	decrement = decrement,
+	clamp = clamp
+}
+
+-- finally we return the result
+if _t(TLC) then
+	_e(TLC, class)
+else return class end
