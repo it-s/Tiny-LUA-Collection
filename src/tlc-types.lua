@@ -1,4 +1,4 @@
-tlc = tlc or {}
+local tlc = tlc or {}
 --------------------------
 --Object type tests
 --------------------------
@@ -32,3 +32,5 @@ end
 tlc.isDefined = function (object)
         return not tlc.isNil(object)
 end
+
+return tlc

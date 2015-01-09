@@ -3,7 +3,7 @@ local ipairs = ipairs
 local _c=function(b,c)for d,e in pairs(c)do b[d]=e end;return b end
 local tlc = {}
 
-function tlc:load(modules, baseDir)
+function tlc:require(modules, baseDir)
   baseDir = baseDir or "lib.tlc."
 --   modules = modules or {
 --     "tlc-logic",

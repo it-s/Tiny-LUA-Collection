@@ -1,4 +1,4 @@
-tlc = tlc or {}
+local tlc = tlc or {}
 --------------------------
 --Table related functions
 --------------------------
@@ -104,3 +104,5 @@ tlc.tableHasKeys = function( tbl, rec )
         end
         return true
 end
+
+return tlc

@@ -1,4 +1,4 @@
-tlc = tlc or {}
+local tlc = tlc or {}
 --------------------------
 --Logic functions
 --------------------------
@@ -53,11 +53,10 @@ tlc.isEven = function(a)
         return not tlc.isOdd(a)
 end
 
--- switch - if condition is satistied then return yes otherwise return no
-tlc.switch = function(condition, yes, no)
-        if condition then
-                return yes
-        else
-                return no
-        end
+-- ifTrue - if condition is satistied then return yes otherwise return no
+tlc.ifTrue = function(condition, yes, no)
+        if condition then return yes else return no end
 end
+
+
+return tlc

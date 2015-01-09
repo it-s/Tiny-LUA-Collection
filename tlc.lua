@@ -16,8 +16,8 @@ tlc.tableKeys = function (tbl)
 	local n = 0
 	
 	for key, value in pairs(tbl) do
-	  n = n + 1
-	  keys[n] = key
+		n = n + 1
+		keys[n] = key
 	end
 	return keys
 end
@@ -32,7 +32,7 @@ tlc.Iterator = function(tbl)
 	local iterator = {}
 	
 	local function _cursor()
-	  return tlc.clamp( cursor, 1, length)
+		return tlc.clamp( cursor, 1, length)
 	end
 	local function _hasNext()
 		return tlc.isLessThen(tlc.increment(cursor), tlc.increment(length))
@@ -77,7 +77,7 @@ tlc.tableCopy = function( tbl )
 	local iterator = tlc.Iterator (tbl)
 	local res = {}
 	for k,v in iterator.next do
-	  res[k] = v
+		res[k] = v
 	end
 	return res
 end
@@ -88,7 +88,7 @@ tlc.tableExtend = function( dest, src )
 	if not tlc.isTable( src ) then return dest end
 	local iterator = tlc.Iterator (src)
 	for k,v in iterator.next do
-	  dest[k] = v
+		dest[k] = v
 	end
 	return dest
 end
@@ -168,13 +168,13 @@ end
 tlc.clamp = function(a, limitA, limitB)
 	if limitB
 		and a > limitB then
-			a = limitB
+		a = limitB
 	end
 	if limitA and
 		(limitB and a < limitA)
 		or
 		(not limitB and a > limitA) then
-			a=limitA
+		a=limitA
 	end
 	return a
 end
@@ -198,8 +198,8 @@ tlc.isLessThen = function(a,limit)
 	return (a < limit)
 end
 
--- isEqualTo - check is a is exactly equal to b
-tlc.isEqualTo = function(a,b)
+-- isEqual - check is a is exactly equal to b
+tlc.isEqual = function(a,b)
 	return (a==b)
 end
 
@@ -234,12 +234,8 @@ tlc.isEven = function(a)
 end
 
 -- switch - if condition is satistied then return yes otherwise return no
-tlc.switch = function(condition, yes, no)
-	if condition then
-		return yes
-	else
-		return no
-	end
+tlc.ifTrue = function(condition, yes, no)
+	if condition then return yes else return no end
 end
 
 --------------------------
@@ -260,18 +256,18 @@ end
 -- Check if module [name] is already loaded
 -- http://stackoverflow.com/questions/15429236/how-to-check-if-a-module-exists-in-lua
 tlc.isModuleAvailable = function (name)
-  if package.loaded[name] then
-    return true
-  else
-    for _, searcher in ipairs(package.searchers or package.loaders) do
-      local loader = searcher(name)
-      if type(loader) == 'function' then
-        package.preload[name] = loader
-        return true
-      end
-    end
-    return false
-  end
+	if package.loaded[name] then
+		return true
+	else
+		for _, searcher in ipairs(package.searchers or package.loaders) do
+			local loader = searcher(name)
+			if type(loader) == 'function' then
+				package.preload[name] = loader
+				return true
+			end
+		end
+		return false
+	end
 end
 
 -- UID - Generate a semi-random ID from os.time()
