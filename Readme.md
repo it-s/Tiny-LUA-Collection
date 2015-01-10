@@ -10,4 +10,6 @@ A small collection of lua functions split into cathegories. Each module is fully
 ```
 ##Initializing the module
 * Include it into your project:
+```lua
   local luaEvents = require "lua-Utilities.[Library Name]"
+```
